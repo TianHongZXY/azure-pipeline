@@ -1,0 +1,28 @@
+$schema: http://azureml/sdk-2-0/CommandComponent.json
+# Metadata
+name: plan.load_data
+version: 0.0.1
+display_name: Load-Data
+type: CommandComponent
+description: Load data from json files
+tags: {author: v-xinyuzhu@microsoft.com}
+is_deterministic: true
+# Interface
+inputs:
+  data_file:
+    type: path
+    description: data files
+    optional: false
+outputs:
+  data:
+    type: list
+    description: list of dict, each example is a dict
+    optional: false
+
+# Command & Environment
+command: >-
+  python load_data.py
+  --data_file {inputs.data_file}
+
+environment:
+  name: AzureML-minimal-ubuntu18.04-py37-cpu-inference

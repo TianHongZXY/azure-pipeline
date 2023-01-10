@@ -1,0 +1,9 @@
+defaults:
+  - _self_
+
+trainer:
+  benchmark_name: test_pipeline
+# data_configs:
+#   train_file: hotpotqa
+#   dev_file: hotpotqa
+#   test_file: hotpotqa
