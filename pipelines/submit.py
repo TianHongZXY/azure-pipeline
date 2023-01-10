@@ -68,6 +68,15 @@ def main(config: PipelineConfig):
     load_data_func = Component.from_yaml(ws, yaml_file=os.path.join(root_directory, "components", "load_data", "load_data.yaml"))
 
     data_file = f"azureml://subscriptions/ws.subscription_id/resourcegroups/ws.resource_group/workspaces/ws.workspace_name/datastores/workspaceblobstore/paths/hotpotqa/hotpot_dev_v1_simplified.json"
-    data = load_data_func(data_file)
-    print(data[0])
+    @dsl.pipeline(
+        name=config.trainer.benchmark_name,
+        display_name=config.trainer.benchmark_name,
+        description=config.trainer.benchmark_name,
+        # default_compute_target=config.aml.cpu_target,
+    )
+    def test_pipeline():
+        data = load_data_func(data_file)
+
+    pipeline = test_pipeline()
+    _ = pipeline.submit(experiment_name="test_pipeline")
 

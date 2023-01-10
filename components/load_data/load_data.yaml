@@ -15,7 +15,7 @@ inputs:
     optional: false
 outputs:
   data:
-    type: enum
+    type: path
     description: list of dict, each example is a dict
     optional: false
 
@@ -23,6 +23,7 @@ outputs:
 command: >-
   python load_data.py
   --data_file {inputs.data_file}
+  --output_dir {outputs.data}
 
 environment:
   name: AzureML-minimal-ubuntu18.04-py37-cpu-inference
