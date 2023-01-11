@@ -1,9 +1,11 @@
 defaults:
   - _self_
+  - aml: aicode
 
 trainer:
-  benchmark_name: test_pipeline
-# data_configs:
-#   train_file: hotpotqa
+  benchmark_name: hotpotqa
+
+data_configs:
+  train_file: hotpotqa
 #   dev_file: hotpotqa
 #   test_file: hotpotqa

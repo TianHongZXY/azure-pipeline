@@ -1,0 +1,4 @@
+workspace_name: aicode
+resource_group: aicode
+subscription_id: 521f9448-5428-4a47-b228-f34801eaaa26
+experiment_name: test_pipeline

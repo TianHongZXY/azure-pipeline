@@ -11,19 +11,16 @@ from azure.ml.component import (
 import hydra
 from hydra.core.config_store import ConfigStore
 from hydra.utils import to_absolute_path
+from azureml.core.authentication import InteractiveLoginAuthentication
 
 
-# @dataclass
-# class AMLConfigIP:
-#     workspace_name: str
-#     resource_group: str
-#     subscription_id: str
-#     cpu_target: str
-#     gpu_target: str
-#     gpu_target_openai: str
-#     experiment_name: str
-#     gpt3_model_selector: str
-#     gpt3_onebox_inference: str
+@dataclass
+class AMLConfigIP:
+    workspace_name: str
+    resource_group: str
+    subscription_id: str
+    cpu_target: str
+    experiment_name: str
 
 
 @dataclass
@@ -31,18 +28,18 @@ class TrainerArgs:
     benchmark_name: str
 
 
-# @dataclass
-# class DataConfigs:
-#     train_file: str
-#     dev_file: str
-#     test_file: str
+@dataclass
+class DataConfigs:
+    train_file: str
+    # dev_file: str
+    # test_file: str
 
 
 @dataclass
 class PipelineConfig:
-    # data_configs: DataConfigs
+    data_configs: DataConfigs
     trainer: TrainerArgs
-    # aml: AMLConfigIP
+    aml: AMLConfigIP
 
 
 cs = ConfigStore.instance()
@@ -53,12 +50,12 @@ cs.store(name="config", node=PipelineConfig)
 def main(config: PipelineConfig):
     # connect to your Azure ML workspace
     ws = Workspace(
-        subscription_id="521f9448-5428-4a47-b228-f34801eaaa26", # config.aml.subscription_id,
-        resource_group="aicode", # config.aml.resource_group,
-        workspace_name="aicode", # config.aml.workspace_name,
+        subscription_id=config.aml.subscription_id,
+        resource_group=config.aml.resource_group,
+        workspace_name=config.aml.workspace_name,
     )
 
-    # train_data = ws.datasets[config.data_configs.train_file]
+    train_data = ws.datasets[config.data_configs.train_file]
     # dev_data = ws.datasets[config.data_configs.dev_file]
     # test_data = ws.datasets[config.data_configs.test_file]
 
@@ -67,7 +64,7 @@ def main(config: PipelineConfig):
 
     load_data_func = Component.from_yaml(ws, yaml_file=os.path.join(root_directory, "components", "load_data", "load_data.yaml"))
 
-    data_file = f"azureml://subscriptions/ws.subscription_id/resourcegroups/ws.resource_group/workspaces/ws.workspace_name/datastores/workspaceblobstore/paths/hotpotqa/hotpot_dev_v1_simplified.json"
+    data_file = f"azureml://subscriptions/{ws.subscription_id}/resourcegroups/{ws.resource_group}/workspaces/{ws.workspace_name}/datastores/workspaceblobstore/paths/hotpotqa/hotpot_dev_v1_simplified.json"
     @dsl.pipeline(
         name=config.trainer.benchmark_name,
         display_name=config.trainer.benchmark_name,
@@ -75,8 +72,13 @@ def main(config: PipelineConfig):
         # default_compute_target=config.aml.cpu_target,
     )
     def test_pipeline():
-        data = load_data_func(data_file)
+        data = load_data_func(data_file=data_file)
+        data.runsettings.target = config.aml.cpu_target
 
     pipeline = test_pipeline()
-    _ = pipeline.submit(experiment_name="test_pipeline")
+    _ = pipeline.submit(experiment_name=config.aml.experiment_name)
 
+if __name__ == "__main__":
+    InteractiveLoginAuthentication(tenant_id="bb6afa85-99dc-4914-add4-c9c283c6e87a")# , force=True)
+    main()
+    print("success")
