@@ -1,7 +1,7 @@
 $schema: http://azureml/sdk-2-0/CommandComponent.json
 # Metadata
 name: plan.load_data
-version: 0.0.1
+version: 0.0.2
 display_name: Load-Data
 type: CommandComponent
 description: Load data from json files
@@ -9,7 +9,7 @@ tags: {author: v-xinyuzhu@microsoft.com}
 is_deterministic: true
 # Interface
 inputs:
-  data_file:
+  data_dir:
     type: path
     description: data files
     optional: false
@@ -22,7 +22,7 @@ outputs:
 # Command & Environment
 command: >-
   python load_data.py
-  --data_file {inputs.data_file}
+  --data_dir {inputs.data_dir}
   --output_dir {outputs.data}
 
 environment:
